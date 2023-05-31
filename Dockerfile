@@ -575,9 +575,9 @@ RUN \
     else \
         # Install mkl for faster computations
         conda install -y --update-all 'python='$PYTHON_VERSION mkl-service mkl ; \
-    fi && \
+    fi 
     # Install some basics - required to run container
-    conda install -y --update-all \
+RUN conda install -y --update-all \
             'python='$PYTHON_VERSION \
             'ipython=8.0.*' \
             'notebook=6.4.*' \
@@ -606,9 +606,9 @@ RUN \
         # Cleanup
         clean-layer.sh && \
         exit 0 ; \
-    fi && \
+    fi 
     # OpenMPI support
-    apt-get install -y --no-install-recommends libopenmpi-dev openmpi-bin && \
+RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
     conda install -y --freeze-installed  \
         'python='$PYTHON_VERSION \
         boost \
