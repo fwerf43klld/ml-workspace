@@ -619,14 +619,6 @@ RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
     conda install -y -c pytorch "pytorch==1.10.*" cpuonly && \
     # Install light pip requirements
     pip install --no-cache-dir --upgrade --upgrade-strategy only-if-needed -r ${RESOURCES_PATH}/libraries/requirements-light.txt && \
-    # If light light flavor - exit here
-    if [ "$WORKSPACE_FLAVOR" = "light" ]; then \
-        # Fix permissions
-        fix-permissions.sh $CONDA_ROOT && \
-        # Cleanup
-        clean-layer.sh && \
-        exit 0 ; \
-    fi && \
     # libartals == 40MB liblapack-dev == 20 MB
     apt-get install -y --no-install-recommends liblapack-dev libatlas-base-dev libeigen3-dev libblas-dev && \
     # pandoc -> installs libluajit -> problem for openresty
@@ -712,22 +704,11 @@ RUN \
     # echo '{"nbext_hide_incompat": false}' > $HOME/.jupyter/nbconfig/common.json && \
     cat $HOME/.jupyter/nbconfig/notebook.json | jq '.toc2={"moveMenuLeft": false,"widenNotebook": false,"skip_h1_title": false,"sideBar": true,"number_sections": false,"collapse_to_match_collapsible_headings": true}' > tmp.$$.json && mv tmp.$$.json $HOME/.jupyter/nbconfig/notebook.json && \
     # If minimal flavor - exit here
-    if [ "$WORKSPACE_FLAVOR" = "minimal" ]; then \
-        # Cleanup
-        clean-layer.sh && \
-        exit 0 ; \
-    fi && \
     # TODO: Not installed. Disable Jupyter Server Proxy
     # jupyter nbextension disable jupyter_server_proxy/tree --sys-prefix && \
     # Install jupyter black
     jupyter nbextension install https://github.com/drillan/jupyter-black/archive/master.zip --sys-prefix && \
     jupyter nbextension enable jupyter-black-master/jupyter-black --sys-prefix && \
-    # If light flavor - exit here
-    if [ "$WORKSPACE_FLAVOR" = "light" ]; then \
-        # Cleanup
-        clean-layer.sh && \
-        exit 0 ; \
-    fi && \
     # Install and activate what if tool
     pip install witwidget && \
     jupyter nbextension install --py --symlink --sys-prefix witwidget && \
@@ -754,16 +735,6 @@ RUN \
     # jupyterlab installed in requirements section
     $lab_ext_install @jupyter-widgets/jupyterlab-manager && \
     # If minimal flavor - do not install jupyterlab extensions
-    if [ "$WORKSPACE_FLAVOR" = "minimal" ]; then \
-        # Final build with minimization
-        jupyter lab build -y --debug-log-path=/dev/stdout --log-level=WARN && \
-        # Cleanup
-        jupyter lab clean && \
-        jlpm cache clean && \
-        rm -rf $CONDA_ROOT/share/jupyter/lab/staging && \
-        clean-layer.sh && \
-        exit 0 ; \
-    fi && \
     $lab_ext_install @jupyterlab/toc && \
     # install temporarily from gitrepo due to the issue that jupyterlab_tensorboard does not work with 3.x yet as described here: https://github.com/chaoleili/jupyterlab_tensorboard/issues/28#issuecomment-783594541
     #$lab_ext_install jupyterlab_tensorboard && \
@@ -774,17 +745,6 @@ RUN \
     # jupyter serverextension enable --py jupyterlab_git && \
     # For Matplotlib: https://github.com/matplotlib/jupyter-matplotlib
     #$lab_ext_install jupyter-matplotlib && \
-    # Do not install any other jupyterlab extensions
-    if [ "$WORKSPACE_FLAVOR" = "light" ]; then \
-        # Final build with minimization
-        jupyter lab build -y --debug-log-path=/dev/stdout --log-level=WARN && \
-        # Cleanup
-        jupyter lab clean && \
-        jlpm cache clean && \
-        rm -rf $CONDA_ROOT/share/jupyter/lab/staging && \
-        clean-layer.sh && \
-        exit 0 ; \
-    fi \
     # Install jupyterlab language server support
     && pip install jupyterlab-lsp==3.7.0 jupyter-lsp==1.3.0 && \
     # $lab_ext_install install @krassowski/jupyterlab-lsp@2.0.8 && \
@@ -856,10 +816,6 @@ RUN \
 # Alternative install: /usr/local/bin/code-server --user-data-dir=$HOME/.config/Code/ --extensions-dir=$HOME/.vscode/extensions/ --install-extension ms-python-release && \
 RUN \
     SLEEP_TIMER=25 && \
-    # If minimal flavor -> exit here
-    if [ "$WORKSPACE_FLAVOR" = "minimal" ]; then \
-        exit 0 ; \
-    fi && \
     cd $RESOURCES_PATH && \
     mkdir -p $HOME/.vscode/extensions/ && \
     # Install vs code jupyter - required by python extension
@@ -877,10 +833,6 @@ RUN \
     mv extension $HOME/.vscode/extensions/ms-python.python-$VS_PYTHON_VERSION && \
     # && code-server --install-extension ms-python.python@$VS_PYTHON_VERSION \
     sleep $SLEEP_TIMER && \
-    # If light flavor -> exit here
-    if [ "$WORKSPACE_FLAVOR" = "light" ]; then \
-        exit 0 ; \
-    fi && \
     # Install prettie: https://github.com/prettier/prettier-vscode/releases
     PRETTIER_VERSION="9.1.1" && \
     wget --no-verbose https://github.com/prettier/prettier-vscode/releases/download/v$PRETTIER_VERSION/prettier-vscode-$PRETTIER_VERSION.vsix && \
@@ -927,11 +879,6 @@ RUN \
     # mysql server: 150MB
     # apt-get install -y mysql-server && \
     # If minimal or light flavor -> exit here
-    if [ "$WORKSPACE_FLAVOR" = "minimal" ] || [ "$WORKSPACE_FLAVOR" = "light" ]; then \
-        # Cleanup
-        clean-layer.sh  && \
-        exit 0 ; \
-    fi && \
     # Install fkill-cli program  TODO: 30MB, remove?
     # npm install --global fkill-cli && \
     # Activate pretty-errors
