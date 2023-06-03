@@ -613,10 +613,19 @@ RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
         'python='$PYTHON_VERSION \
         boost \
         mkl-include && \
+    # Fix permissions
+    fix-permissions.sh $CONDA_ROOT && \
+    # Cleanup
+    clean-layer.sh
     # Install mkldnn
-    conda install -y -c mingfeima mkldnn && \
+RUN conda install -y -c mingfeima mkldnn && \
     # Install pytorch - cpu only
-    conda install -y -c pytorch "pytorch==1.10.*" cpuonly && \
+    # Fix permissions
+    fix-permissions.sh $CONDA_ROOT && \
+    # Cleanup
+    clean-layer.sh
+    
+RUN conda install -y -c pytorch "pytorch==1.10.*" cpuonly && \
     # Install light pip requirements
     pip install --no-cache-dir --upgrade --upgrade-strategy only-if-needed -r ${RESOURCES_PATH}/libraries/requirements-light.txt && \
     # libartals == 40MB liblapack-dev == 20 MB
@@ -637,7 +646,12 @@ RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
     # Install Intel(R) Compiler Runtime - numba optimization
     # TODO: don't install, results in memory error: conda install -y --freeze-installed -c numba icc_rt && \
     # Install libjpeg turbo for speedup in image processing
-    conda install -y --freeze-installed libjpeg-turbo && \
+    # Fix permissions
+    fix-permissions.sh $CONDA_ROOT && \
+    # Cleanup
+    clean-layer.sh
+    
+RUN    conda install -y --freeze-installed libjpeg-turbo && \
     # Add snakemake for workflow management
     conda install -y -c bioconda -c conda-forge snakemake-minimal && \
     # Add mamba as conda alternativ
