@@ -614,7 +614,7 @@ RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
         boost \
         mkl-include && \
     # Install mkldnn
-    conda install -y --freeze-installed -c mingfeima mkldnn && \
+    conda install -y -c mingfeima mkldnn && \
     # Install pytorch - cpu only
     conda install -y -c pytorch "pytorch==1.10.*" cpuonly && \
     # Install light pip requirements
