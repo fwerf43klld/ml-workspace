@@ -618,12 +618,12 @@ RUN    apt-get install -y libopenmpi-dev openmpi-bin && \
     # Cleanup
     clean-layer.sh
     # Install mkldnn
-RUN conda install -y -c mingfeima mkldnn && \
-    # Install pytorch - cpu only
-    # Fix permissions
-    fix-permissions.sh $CONDA_ROOT && \
-    # Cleanup
-    clean-layer.sh
+#RUN conda install -y -c mingfeima mkldnn && \
+#    # Install pytorch - cpu only
+#    # Fix permissions
+#    fix-permissions.sh $CONDA_ROOT && \
+#    # Cleanup
+#    clean-layer.sh
     
 RUN conda install -y -c pytorch "pytorch==1.10.*" cpuonly && \
     # Install light pip requirements
